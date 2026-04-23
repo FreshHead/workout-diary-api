@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Exercise} from './exercise.model';
 
 @model()
 export class Workout extends Entity {
@@ -20,6 +21,8 @@ export class Workout extends Entity {
   })
   notes?: string;
 
+  @hasMany(() => Exercise)
+  exercises: Exercise[];
 
   constructor(data?: Partial<Workout>) {
     super(data);

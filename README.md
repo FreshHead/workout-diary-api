@@ -35,19 +35,25 @@
 
 ## Эндпоинты
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| GET | `/workouts` | Список всех тренировок |
-| POST | `/workouts` | Создать тренировку |
-| GET | `/workouts/{id}` | Получить тренировку |
-| PATCH | `/workouts/{id}` | Обновить тренировку |
-| DELETE | `/workouts/{id}` | Удалить тренировку |
-| GET | `/workouts/{id}/exercises` | Упражнения тренировки |
-| POST | `/workouts/{id}/exercises` | Добавить упражнение |
-| DELETE | `/workouts/{id}/exercises/{exerciseId}` | Удалить упражнение |
-
+| Метод  | Путь                                    | Описание               |
+| ------ | --------------------------------------- | ---------------------- |
+| GET    | `/workouts`                             | Список всех тренировок |
+| POST   | `/workouts`                             | Создать тренировку     |
+| GET    | `/workouts/{id}`                        | Получить тренировку    |
+| PATCH  | `/workouts/{id}`                        | Обновить тренировку    |
+| DELETE | `/workouts/{id}`                        | Удалить тренировку     |
+| GET    | `/workouts/{id}/exercises`              | Упражнения тренировки  |
+| POST   | `/workouts/{id}/exercises`              | Добавить упражнение    |
+| DELETE | `/workouts/{id}/exercises/{exerciseId}` | Удалить упражнение     |
 
 ## Запуск проекта:
+
+Запустите mongo, например через Docker:
+
+```
+sudo docker run -d -p 27017:27017 --name mongodb mongo
+```
+
 ```
 npm start
 ```
