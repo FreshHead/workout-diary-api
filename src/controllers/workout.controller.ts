@@ -37,7 +37,7 @@ export class WorkoutController {
         'application/json': {
           schema: getModelSchemaRef(Workout, {
             title: 'NewWorkout',
-            exclude: ['Id'],
+            exclude: ['id'],
           }),
         },
       },

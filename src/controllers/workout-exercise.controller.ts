@@ -54,7 +54,7 @@ export class WorkoutExerciseController {
     },
   })
   async create(
-    @param.path.string('id') id: typeof Workout.prototype.Id,
+    @param.path.string('id') id: typeof Workout.prototype.id,
     @requestBody({
       content: {
         'application/json': {

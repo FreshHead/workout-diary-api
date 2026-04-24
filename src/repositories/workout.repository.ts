@@ -6,11 +6,11 @@ import {ExerciseRepository} from './exercise.repository';
 
 export class WorkoutRepository extends DefaultCrudRepository<
   Workout,
-  typeof Workout.prototype.Id,
+  typeof Workout.prototype.id,
   WorkoutRelations
 > {
 
-  public readonly exercises: HasManyRepositoryFactory<Exercise, typeof Workout.prototype.Id>;
+  public readonly exercises: HasManyRepositoryFactory<Exercise, typeof Workout.prototype.id>;
 
   constructor(
     @inject('datasources.db') dataSource: DbDataSource, @repository.getter('ExerciseRepository') protected exerciseRepositoryGetter: Getter<ExerciseRepository>,

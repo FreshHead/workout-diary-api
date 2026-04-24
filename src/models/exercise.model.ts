@@ -29,7 +29,7 @@ export class Exercise extends Entity {
 
   @property({
     type: 'number',
-    required: true,
+    required: false,
   })
   weight: number;
 

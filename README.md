@@ -54,6 +54,20 @@
 sudo docker run -d -p 27017:27017 --name mongodb mongo
 ```
 
+Для дальнейших запусков просто:
+
+```
+sudo docker start mongodb
+```
+
+Запустите сервер:
+
 ```
 npm start
+```
+
+Для обновления от изменений в другой вкладке терминала:
+
+```
+npm run build:watch
 ```
