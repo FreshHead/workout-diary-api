@@ -123,11 +123,11 @@ export class WorkoutExerciseController {
     return this.workoutRepository.exercises(id).delete(where);
   }
 
-private async assertWorkoutOwner(id: string, userId: string): Promise<void> {
-  const workout = await this.workoutRepository.findById(id);
-  if (workout.userId !== userId) {
-    throw new HttpErrors.Forbidden();
+  private async assertWorkoutOwner(id: string, userId: string): Promise<void> {
+    const workout = await this.workoutRepository.findById(id);
+    if (workout.userId !== userId) {
+      throw new HttpErrors.Forbidden();
+    }
   }
-}
 }
 
