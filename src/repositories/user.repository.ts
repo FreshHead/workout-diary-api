@@ -1,16 +1,17 @@
-import {inject} from '@loopback/core';
-import {DefaultCrudRepository} from '@loopback/repository';
+import {Getter, inject} from '@loopback/core';
 import {DbDataSource} from '../datasources';
-import {User, UserRelations} from '../models';
+import {UserRepository as JwtUserRepository} from '@loopback/authentication-jwt';
+import { UserCredentialsRepository } from '@loopback/authentication-jwt';
+import { repository } from '@loopback/repository';
+import { WorkoutRepository } from './workout.repository';
 
-export class UserRepository extends DefaultCrudRepository<
-  User,
-  typeof User.prototype.id,
-  UserRelations
-> {
+export class UserRepository extends JwtUserRepository {
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
+    @repository.getter('UserCredentialsRepository')
+userCredentialsRepositoryGetter: Getter<UserCredentialsRepository>,
+    @repository.getter('WorkoutRepository') protected workoutRepositoryGetter: Getter<WorkoutRepository>
   ) {
-    super(User, dataSource);
+    super(dataSource, userCredentialsRepositoryGetter);
   }
 }

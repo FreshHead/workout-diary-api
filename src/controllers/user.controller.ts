@@ -13,12 +13,12 @@ import {
   RefreshTokenServiceBindings,
   TokenObject,
   TokenServiceBindings,
-  User,
   UserServiceBindings,
-  UserRepository,
   Credentials,
   RefreshTokenService
 } from '@loopback/authentication-jwt';
+import {User} from '../models/user.model';
+import { UserRepository } from '../repositories/user.repository';
 
 // Describes the type of grant object taken in by method "refresh"
 type RefreshGrant = {
@@ -115,7 +115,7 @@ export class UserController {
       },
     })
     newUserRequest: NewUserRequest,
-  ): Promise<User> {
+  ): Promise<Omit<User, 'workouts'>> {
     const password = await hash(newUserRequest.password, await genSalt());
     delete (newUserRequest as Partial<NewUserRequest>).password;
     const savedUser = await this.userRepository.create(newUserRequest);
