@@ -12,10 +12,10 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
   response,
+  HttpErrors,
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile, securityId} from '@loopback/security';
 import {Workout} from '../models';
@@ -95,6 +95,7 @@ export class WorkoutController {
     content: {'application/json': {schema: CountSchema}},
   })
   async updateAll(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -105,7 +106,8 @@ export class WorkoutController {
     workout: Workout,
     @param.where(Workout) where?: Where<Workout>,
   ): Promise<Count> {
-    return this.workoutRepository.updateAll(workout, where);
+    const userId = currentUser[securityId];
+    return this.workoutRepository.updateAll(workout, {...where, userId});
   }
 
   @authenticate('jwt')
@@ -119,10 +121,16 @@ export class WorkoutController {
     },
   })
   async findById(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: string,
     @param.filter(Workout, {exclude: 'where'}) filter?: FilterExcludingWhere<Workout>
   ): Promise<Workout> {
-    return this.workoutRepository.findById(id, filter);
+    const userId = currentUser[securityId];
+    const workout = await this.workoutRepository.findById(id, filter);
+    if(workout.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
+    return workout;
   }
 
   @authenticate('jwt')
@@ -131,6 +139,7 @@ export class WorkoutController {
     description: 'Workout PATCH success',
   })
   async updateById(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: string,
     @requestBody({
       content: {
@@ -141,19 +150,12 @@ export class WorkoutController {
     })
     workout: Workout,
   ): Promise<void> {
+    const userId = currentUser[securityId];
+    const workoutWithUserId = await this.workoutRepository.findById(id);
+    if(workoutWithUserId.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
     await this.workoutRepository.updateById(id, workout);
-  }
-
-  @authenticate('jwt')
-  @put('/workouts/{id}')
-  @response(204, {
-    description: 'Workout PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() workout: Workout,
-  ): Promise<void> {
-    await this.workoutRepository.replaceById(id, workout);
   }
 
   @authenticate('jwt')
@@ -161,7 +163,16 @@ export class WorkoutController {
   @response(204, {
     description: 'Workout DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
+    @param.path.string('id') id: string
+  ): Promise<void> {
+    const userId = currentUser[securityId];
+    const workoutWithUserId = await this.workoutRepository.findById(id);
+    if(workoutWithUserId.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
+
     await this.workoutRepository.deleteById(id);
   }
 }

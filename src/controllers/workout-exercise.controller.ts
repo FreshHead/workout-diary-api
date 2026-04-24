@@ -5,11 +5,13 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
+import {SecurityBindings, UserProfile, securityId} from '@loopback/security';
 import {
   del,
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
+  HttpErrors,
   param,
   patch,
   post,
@@ -20,12 +22,15 @@ import {
   Exercise,
 } from '../models';
 import {WorkoutRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
+import { inject } from '@loopback/core';
 
 export class WorkoutExerciseController {
   constructor(
     @repository(WorkoutRepository) protected workoutRepository: WorkoutRepository,
   ) { }
 
+  @authenticate('jwt')
   @get('/workouts/{id}/exercises', {
     responses: {
       '200': {
@@ -39,12 +44,19 @@ export class WorkoutExerciseController {
     },
   })
   async find(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Exercise>,
   ): Promise<Exercise[]> {
+    const userId = currentUser[securityId];
+    const workout = await this.workoutRepository.findById(id);
+    if(workout.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
     return this.workoutRepository.exercises(id).find(filter);
   }
 
+  @authenticate('jwt')
   @post('/workouts/{id}/exercises', {
     responses: {
       '200': {
@@ -54,6 +66,7 @@ export class WorkoutExerciseController {
     },
   })
   async create(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: typeof Workout.prototype.id,
     @requestBody({
       content: {
@@ -67,9 +80,15 @@ export class WorkoutExerciseController {
       },
     }) exercise: Omit<Exercise, 'id'>,
   ): Promise<Exercise> {
+    const userId = currentUser[securityId];
+    const workout = await this.workoutRepository.findById(id);
+    if(workout.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
     return this.workoutRepository.exercises(id).create(exercise);
   }
 
+  @authenticate('jwt')
   @patch('/workouts/{id}/exercises', {
     responses: {
       '200': {
@@ -79,6 +98,7 @@ export class WorkoutExerciseController {
     },
   })
   async patch(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: string,
     @requestBody({
       content: {
@@ -90,9 +110,15 @@ export class WorkoutExerciseController {
     exercise: Partial<Exercise>,
     @param.query.object('where', getWhereSchemaFor(Exercise)) where?: Where<Exercise>,
   ): Promise<Count> {
+    const userId = currentUser[securityId];
+    const workout = await this.workoutRepository.findById(id);
+    if(workout.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
     return this.workoutRepository.exercises(id).patch(exercise, where);
   }
 
+  @authenticate('jwt')
   @del('/workouts/{id}/exercises', {
     responses: {
       '200': {
@@ -102,9 +128,15 @@ export class WorkoutExerciseController {
     },
   })
   async delete(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Exercise)) where?: Where<Exercise>,
   ): Promise<Count> {
+    const userId = currentUser[securityId];
+    const workout = await this.workoutRepository.findById(id);
+    if(workout.userId !== userId){
+      throw new HttpErrors.Forbidden()
+    }
     return this.workoutRepository.exercises(id).delete(where);
   }
 }
