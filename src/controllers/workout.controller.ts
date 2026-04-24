@@ -17,9 +17,11 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {SecurityBindings, UserProfile, securityId} from '@loopback/security';
 import {Workout} from '../models';
 import {WorkoutRepository} from '../repositories';
 import { authenticate } from '@loopback/authentication';
+import { inject } from '@loopback/core';
 
 export class WorkoutController {
   constructor(
@@ -34,6 +36,7 @@ export class WorkoutController {
     content: {'application/json': {schema: getModelSchemaRef(Workout)}},
   })
   async create(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -46,7 +49,8 @@ export class WorkoutController {
     })
     workout: Omit<Workout, 'id'>,
   ): Promise<Workout> {
-    return this.workoutRepository.create(workout);
+    const userId = currentUser[securityId];
+    return this.workoutRepository.create({...workout, userId});
   }
 
   @authenticate('jwt')
@@ -56,9 +60,11 @@ export class WorkoutController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.where(Workout) where?: Where<Workout>,
   ): Promise<Count> {
-    return this.workoutRepository.count(where);
+    const userId = currentUser[securityId];
+    return this.workoutRepository.count({...where, userId});
   }
 
   @authenticate('jwt')
@@ -75,9 +81,11 @@ export class WorkoutController {
     },
   })
   async find(
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.filter(Workout) filter?: Filter<Workout>,
   ): Promise<Workout[]> {
-    return this.workoutRepository.find(filter);
+    const userId = currentUser[securityId];
+    return this.workoutRepository.find({...filter, where: {...filter?.where, userId}});
   }
 
   @authenticate('jwt')
