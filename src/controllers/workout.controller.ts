@@ -19,6 +19,7 @@ import {
 } from '@loopback/rest';
 import {Workout} from '../models';
 import {WorkoutRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
 export class WorkoutController {
   constructor(
@@ -26,6 +27,7 @@ export class WorkoutController {
     public workoutRepository : WorkoutRepository,
   ) {}
 
+  @authenticate('jwt')
   @post('/workouts')
   @response(200, {
     description: 'Workout model instance',
@@ -47,6 +49,7 @@ export class WorkoutController {
     return this.workoutRepository.create(workout);
   }
 
+  @authenticate('jwt')
   @get('/workouts/count')
   @response(200, {
     description: 'Workout model count',
@@ -58,6 +61,7 @@ export class WorkoutController {
     return this.workoutRepository.count(where);
   }
 
+  @authenticate('jwt')
   @get('/workouts')
   @response(200, {
     description: 'Array of Workout model instances',
@@ -76,6 +80,7 @@ export class WorkoutController {
     return this.workoutRepository.find(filter);
   }
 
+  @authenticate('jwt')
   @patch('/workouts')
   @response(200, {
     description: 'Workout PATCH success count',
@@ -95,6 +100,7 @@ export class WorkoutController {
     return this.workoutRepository.updateAll(workout, where);
   }
 
+  @authenticate('jwt')
   @get('/workouts/{id}')
   @response(200, {
     description: 'Workout model instance',
@@ -111,6 +117,7 @@ export class WorkoutController {
     return this.workoutRepository.findById(id, filter);
   }
 
+  @authenticate('jwt')
   @patch('/workouts/{id}')
   @response(204, {
     description: 'Workout PATCH success',
@@ -129,6 +136,7 @@ export class WorkoutController {
     await this.workoutRepository.updateById(id, workout);
   }
 
+  @authenticate('jwt')
   @put('/workouts/{id}')
   @response(204, {
     description: 'Workout PUT success',
@@ -140,6 +148,7 @@ export class WorkoutController {
     await this.workoutRepository.replaceById(id, workout);
   }
 
+  @authenticate('jwt')
   @del('/workouts/{id}')
   @response(204, {
     description: 'Workout DELETE success',
