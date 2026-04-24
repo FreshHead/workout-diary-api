@@ -15,6 +15,7 @@ import {
   RefreshTokenServiceBindings,
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
+import { DbDataSource } from './datasources/db.datasource';
 
 export {ApplicationConfig};
 
@@ -34,7 +35,11 @@ export class WorkoutDiaryApiApplication extends BootMixin(
     this.component(AuthenticationComponent);
     // Mount jwt component
     this.component(JWTAuthenticationComponent);
-
+    // Bind datasource
+    this.dataSource(DbDataSource, UserServiceBindings.DATASOURCE_NAME);
+    //Bind datasource for refreshtoken table
+    this.dataSource(DbDataSource, RefreshTokenServiceBindings.DATASOURCE_NAME);
+    //
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
       path: '/explorer',
