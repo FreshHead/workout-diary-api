@@ -18,7 +18,6 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {
-  Workout,
   Exercise,
 } from '../models';
 import {WorkoutRepository} from '../repositories';
@@ -48,11 +47,7 @@ export class WorkoutExerciseController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Exercise>,
   ): Promise<Exercise[]> {
-    const userId = currentUser[securityId];
-    const workout = await this.workoutRepository.findById(id);
-    if(workout.userId !== userId){
-      throw new HttpErrors.Forbidden()
-    }
+    await this.assertWorkoutOwner(id, currentUser[securityId])
     return this.workoutRepository.exercises(id).find(filter);
   }
 
@@ -67,7 +62,7 @@ export class WorkoutExerciseController {
   })
   async create(
     @inject(SecurityBindings.USER) currentUser: UserProfile,
-    @param.path.string('id') id: typeof Workout.prototype.id,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -80,11 +75,7 @@ export class WorkoutExerciseController {
       },
     }) exercise: Omit<Exercise, 'id'>,
   ): Promise<Exercise> {
-    const userId = currentUser[securityId];
-    const workout = await this.workoutRepository.findById(id);
-    if(workout.userId !== userId){
-      throw new HttpErrors.Forbidden()
-    }
+    await this.assertWorkoutOwner(id, currentUser[securityId])
     return this.workoutRepository.exercises(id).create(exercise);
   }
 
@@ -110,11 +101,7 @@ export class WorkoutExerciseController {
     exercise: Partial<Exercise>,
     @param.query.object('where', getWhereSchemaFor(Exercise)) where?: Where<Exercise>,
   ): Promise<Count> {
-    const userId = currentUser[securityId];
-    const workout = await this.workoutRepository.findById(id);
-    if(workout.userId !== userId){
-      throw new HttpErrors.Forbidden()
-    }
+    await this.assertWorkoutOwner(id, currentUser[securityId])
     return this.workoutRepository.exercises(id).patch(exercise, where);
   }
 
@@ -132,11 +119,15 @@ export class WorkoutExerciseController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Exercise)) where?: Where<Exercise>,
   ): Promise<Count> {
-    const userId = currentUser[securityId];
-    const workout = await this.workoutRepository.findById(id);
-    if(workout.userId !== userId){
-      throw new HttpErrors.Forbidden()
-    }
+    await this.assertWorkoutOwner(id, currentUser[securityId])
     return this.workoutRepository.exercises(id).delete(where);
   }
+
+private async assertWorkoutOwner(id: string, userId: string): Promise<void> {
+  const workout = await this.workoutRepository.findById(id);
+  if (workout.userId !== userId) {
+    throw new HttpErrors.Forbidden();
+  }
 }
+}
+
