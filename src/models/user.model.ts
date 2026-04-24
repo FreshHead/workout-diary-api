@@ -1,26 +1,12 @@
-import {Entity, model, property} from '@loopback/repository';
+import {hasMany, model} from '@loopback/repository';
+import {User as JwtUser} from '@loopback/authentication-jwt';
+import { Workout } from './workout.model';
 
 @model()
-export class User extends Entity {
-  @property({
-    type: 'string',
-    id: true,
-    generated: true,
-  })
-  id?: string;
+export class User extends JwtUser {
 
-  @property({
-    type: 'string',
-    required: true,
-  })
-  email: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
-
+  @hasMany(() => Workout)
+  workouts: Workout[];
 
   constructor(data?: Partial<User>) {
     super(data);

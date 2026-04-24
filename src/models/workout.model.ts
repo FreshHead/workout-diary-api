@@ -21,6 +21,11 @@ export class Workout extends Entity {
   })
   notes?: string;
 
+  @property({
+    type: 'string',
+  })
+  userId?: string;
+
   @hasMany(() => Exercise)
   exercises: Exercise[];
 
